@@ -37,3 +37,5 @@ hosts.yml
 ```
 
 execute `ansible-playbook configure-pis.yml -i hosts.yml` (if you haven't configured ssh login then add `--ask-pass`)
+
+![alt text](imgs/pi-cluster-off.jpg?raw=true "The Porta Pi DC Cluster!")
