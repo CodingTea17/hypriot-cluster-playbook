@@ -1,0 +1,12 @@
+- name: Fresh reboot
+  reboot:
+  when: og_user_data.stat.checksum != new_user_data.stat.checksum
+
+- name: Reset Kubernetes
+  shell: kubeadm reset -f
+  register: kubeadm_reset
+
+- name: Join the cluster
+  shell: >
+    {{ kubernetes_join_command }}
+    creates=/etc/kubernetes/kubelet.conf

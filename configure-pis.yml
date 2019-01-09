@@ -1,0 +1,25 @@
+---
+
+- name: Ansible Playbook for Configuring Raspberry Pi HypriotOS Kubernetes Nodes
+  hosts: init-nodes
+  remote_user: bantha
+  become: yes
+  vars_files:
+    - vars/variables.yml
+  roles:
+    - {role: setup, tags: ['setup']}
+
+
+- name: Master nodes only setup
+  hosts: masters
+  remote_user: bantha
+  become: yes
+  roles:
+    - {role: masters, tags: ['masters']}
+
+- name: Worker nodes only setup
+  hosts: workers
+  remote_user: bantha
+  become: yes
+  roles:
+    - {role: workers, tags: ['workers']}

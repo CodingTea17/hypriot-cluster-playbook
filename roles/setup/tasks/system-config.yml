@@ -1,0 +1,27 @@
+- name: Register existing user-data checksum
+  stat:
+    path: /boot/user-data
+    get_checksum: yes
+  register: og_user_data
+  
+- name: Template user-data for cloud-init config
+  template:
+    src: user-data.j2
+    dest: /boot/user-data
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Register new user-data checksum
+  stat:
+    path: /boot/user-data
+    get_checksum: yes
+  register: new_user_data
+
+- name: Transfer cmdline.txt
+  copy:
+    src: ../files/cmdline.txt
+    dest: /boot/cmdline.txt
+    owner: root
+    group: root
+    mode: 0755

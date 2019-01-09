@@ -1,0 +1,57 @@
+- name: Fresh reboot
+  reboot:
+  when: og_user_data.stat.checksum != new_user_data.stat.checksum
+
+- name: Check and register cluster status
+  stat:
+    path: /etc/kubernetes/admin.conf
+  register: cluster_status
+
+# 10.244/16 to support the use of flannel as cni and skip SystemVerification bc I am using a currently unvalidated version of Docker (18.09)
+- name: Kubeadm init
+  command: kubeadm init --pod-network-cidr=10.244.0.0/16 --ignore-preflight-errors=SystemVerification
+  register: kubeadmin_init
+  failed_when: false
+  when: not cluster_status.stat.exists
+
+- name: Ensure .kube directory exists for our bantha user
+  file:
+    path: ~bantha/.kube
+    state: directory
+
+- name: Copy admin.conf to the user .kube directory
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: ~bantha/.kube/config
+    owner: bantha
+    group: bantha
+    mode: 0755
+    remote_src: yes
+    backup: yes
+
+- name: Ensure .kube directory exists in the root user dir
+  file:
+    path: $HOME/.kube
+    state: directory
+
+- name: Symlink the conf so that root user has access to kubectl
+  file:
+    src: /etc/kubernetes/admin.conf
+    dest: $HOME/.kube/config
+    state: link
+
+- name: Create a join token and register it
+  command: kubeadm token create --print-join-command
+  changed_when: false
+  register: kubernetes_join_token
+
+- name: Distribute the join token to all worker nodes
+  set_fact:
+    kubernetes_join_command: "{{ kubernetes_join_token.stdout }}"
+  when: kubernetes_join_token.stdout is defined
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  loop: "{{ groups['workers'] }}"
+
+- name: Install flannel
+  shell: curl -sSL https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml | sed 's/amd64/arm/g' | kubectl apply -f -

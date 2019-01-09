@@ -1,0 +1,4 @@
+vars/variables.yml
+hosts.yml
+*.retry
+

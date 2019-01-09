@@ -1,0 +1,9 @@
+- name: Template user-data and network config
+  import_tasks: system-config.yml
+
+- name: Install kube{"ctl", "adm", and "let"}
+  import_tasks: install-kube.yml
+
+- name: Restore cloud-init state
+  import_tasks: clean-cloud-init.yml
+  when: og_user_data.stat.checksum != new_user_data.stat.checksum

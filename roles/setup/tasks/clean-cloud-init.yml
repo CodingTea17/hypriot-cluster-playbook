@@ -1,0 +1,47 @@
+- name: Remove /var/lib/cloud/instance
+  file:
+    state: absent
+    path: /var/lib/cloud/instance
+
+- name: Remove /var/lib/cloud/instances
+  file:
+    state: absent
+    path: /var/lib/cloud/instances
+
+- name: Remove /var/lib/cloud/sem
+  file:
+    state: absent
+    path: /var/lib/cloud/sem
+
+
+# - name: Find files in /var/lib/cloud/instances
+#   find:
+#     paths: /var/lib/cloud/instances
+#     patterns: "*"
+#   register: cloud_instances_files
+
+# - name: Remove /var/lib/cloud/instances/*
+#   file:
+#     path: "{{ item['path'] }}"
+#     state: absent
+#   loop: 
+#     "{{ cloud_instances_files['files'] }}"
+
+# - name: Find files in /var/lib/cloud/sem
+#   find:
+#     paths: /var/lib/cloud/sem
+#     patterns: "*"
+#   register: cloud_sem_files
+
+# - name: Remove /var/lib/cloud/instances/*
+#   file:
+#     path: "{{ item['path'] }}"
+#     state: absent
+#   loop: 
+#     "{{ cloud_sem_files['files'] }}"
+
+- name: Re-init cloud-init
+  command: /usr/bin/cloud-init init
+
+- name: Initialize modules
+  command: /usr/bin/cloud-init modules -m final
