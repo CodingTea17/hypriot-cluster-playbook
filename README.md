@@ -1,5 +1,5 @@
 # Hypriot Cluster Playbook
-A set of roles to configure and initialize a Kubernetes cluster on a group of Raspberry Pis running HypriotOS. There are two major components here. First off, we're bootstrapping the nodes using a cloud-init script (yes it's technically hacky because our init count >1...) and prepping them for duty. This step can involve changing the nodes' IPs and will fail when after it runs. To avoid that just use the DHCP assigned IPs and configure them as the static_host_ip. The second part involves using kubeadm to init a new cluster, fire up flannel, and then join the worker nodes.
+A set of roles to configure and initialize a Kubernetes cluster on a group of Raspberry Pis running HypriotOS. There are two major components here. First off, we're bootstrapping the nodes using a cloud-init script (yes it's technically hacky because our init count >1...) and prepping them for duty. This step can involve changing the nodes' IPs and will fail after it runs the cloud-init script. To avoid that just use the DHCP assigned IPs and configure them as the static_host_ip. The second part involves using kubeadm to init a new cluster, fire up flannel, and then join the worker nodes.
 
 # Setup
 vars/variables.yml
